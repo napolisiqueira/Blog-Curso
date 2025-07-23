@@ -1,0 +1,28 @@
+services:
+  djangoapp:
+    container_name: djangoapp
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./djangoapp:/djangoapp
+      - ./data/web/static:/data/web/static/
+      - ./data/web/media:/data/web/media/
+    env_file:
+      - ./dotenv_files/.env # Carrega todas as variáveis do seu .env
+    environment:
+      # Sobrescreve POSTGRES_HOST para que o djangoapp se conecte ao serviço 'psql'
+      - POSTGRES_HOST=psql
+      # POSTGRES_PORT já está correto no seu .env (5432), mas é bom manter a clareza
+      - POSTGRES_PORT=5432
+    depends_on:
+      - psql
+
+  psql:
+    container_name: psql
+    image: postgres:14-alpine
+    volumes:
+      - ./data/postgres/data:/var/lib/postgresql/data/
+    env_file:
+      - ./dotenv_files/.env # Carrega as variáveis do DB para o serviço psql
